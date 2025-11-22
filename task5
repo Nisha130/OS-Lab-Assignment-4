@@ -1,0 +1,106 @@
+# Full CPU Scheduling Code (FCFS, SJF, Priority, Round Robin)
+
+def calc_avg(values):
+    return sum(values) / len(values)
+
+def fcfs(processes):
+    n = len(processes)
+    wt = [0] * n
+    tat = [0] * n
+    for i in range(1, n):
+        wt[i] = wt[i-1] + processes[i-1][1]
+    for i in range(n):
+        tat[i] = wt[i] + processes[i][1]
+
+    print("\n--- FCFS Scheduling ---")
+    print("PID\tBT\tWT\tTAT")
+    for i in range(n):
+        print(processes[i][0], "\t", processes[i][1], "\t", wt[i], "\t", tat[i])
+
+    print("Average WT:", calc_avg(wt))
+    print("Average TAT:", calc_avg(tat))
+
+
+def sjf(processes):
+    processes = sorted(processes, key=lambda x: x[1])
+    n = len(processes)
+    wt = [0] * n
+    tat = [0] * n
+
+    for i in range(1, n):
+        wt[i] = wt[i-1] + processes[i-1][1]
+    for i in range(n):
+        tat[i] = wt[i] + processes[i][1]
+
+    print("\n--- SJF Scheduling ---")
+    print("PID\tBT\tWT\tTAT")
+    for i in range(n):
+        print(processes[i][0], "\t", processes[i][1], "\t", wt[i], "\t", tat[i])
+
+    print("Average WT:", calc_avg(wt))
+    print("Average TAT:", calc_avg(tat))
+
+
+def priority_scheduling(processes):
+    processes = sorted(processes, key=lambda x: x[2])
+    n = len(processes)
+
+    wt = [0] * n
+    tat = [0] * n
+
+    for i in range(1, n):
+        wt[i] = wt[i-1] + processes[i-1][1]
+    for i in range(n):
+        tat[i] = wt[i] + processes[i][1]
+
+    print("\n--- Priority Scheduling ---")
+    print("PID\tBT\tPR\tWT\tTAT")
+    for i in range(n):
+        print(processes[i][0], "\t", processes[i][1], "\t", processes[i][2], "\t", wt[i], "\t", tat[i])
+
+    print("Average WT:", calc_avg(wt))
+    print("Average TAT:", calc_avg(tat))
+
+
+def round_robin(processes, quantum):
+    n = len(processes)
+    bt = [p[1] for p in processes]
+    rt = bt[:]
+    wt = [0] * n
+    tat = [0] * n
+    t = 0
+
+    while True:
+        done = True
+        for i in range(n):
+            if rt[i] > 0:
+                done = False
+                if rt[i] > quantum:
+                    t += quantum
+                    rt[i] -= quantum
+                else:
+                    t += rt[i]
+                    wt[i] = t - bt[i]
+                    rt[i] = 0
+        if done:
+            break
+
+    for i in range(n):
+        tat[i] = wt[i] + bt[i]
+
+    print("\n--- Round Robin Scheduling ---")
+    print("PID\tBT\tWT\tTAT")
+    for i in range(n):
+        print(processes[i][0], "\t", processes[i][1], "\t", wt[i], "\t", tat[i])
+
+    print("Average WT:", calc_avg(wt))
+    print("Average TAT:", calc_avg(tat))
+
+
+processes = [(1, 10, 3), (2, 5, 1), (3, 8, 4)]
+quantum = 2
+
+fcfs(processes)
+sjf(processes)
+priority_scheduling(processes)
+round_robin(processes, quantum)
